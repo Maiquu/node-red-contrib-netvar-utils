@@ -1,0 +1,7 @@
+#!/bin/bash
+if [[ -e node-red.pid ]]; then
+  kill -s SIGTERM "$(cat node-red.pid)"
+fi
+
+node-red &> node-red.log &
+echo "$!" > node-red.pid

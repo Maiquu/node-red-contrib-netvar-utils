@@ -1,0 +1,23 @@
+import { NodeInitializer } from "node-red";
+import { NvlConfigNode } from '../nvl-config/modules/types'
+import { <%NodeTypePascalCase%>Node, <%NodeTypePascalCase%>NodeDef } from "./modules/types";
+
+const nodeInit: NodeInitializer = (RED): void => {
+  function <%NodeTypePascalCase%>NodeConstructor(
+    this: <%NodeTypePascalCase%>Node,
+    config: <%NodeTypePascalCase%>NodeDef
+  ): void {
+    RED.nodes.createNode(this, config);
+
+    this.nvl = RED.nodes.getNode(config.nvl) as NvlConfigNode
+
+    this.on("input", (msg, send, done) => {
+      send(msg);
+      done();
+    });
+  }
+
+  RED.nodes.registerType("<%NodeTypeKebabCase%>", <%NodeTypePascalCase%>NodeConstructor);
+};
+
+export = nodeInit;

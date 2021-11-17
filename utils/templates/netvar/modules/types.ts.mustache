@@ -1,0 +1,10 @@
+import { Node, NodeDef } from "node-red";
+import { NvlConfigNode } from 'src/nodes/nvl-config/modules/types'
+import { <%NodeTypePascalCase%>Options } from "../shared/types";
+
+export interface <%NodeTypePascalCase%>NodeDef extends NodeDef, <%NodeTypePascalCase%>Options {}
+
+export interface <%NodeTypePascalCase%>Node extends Node {
+  nvl?: NvlConfigNode
+}
+

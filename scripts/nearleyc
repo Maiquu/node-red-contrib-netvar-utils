@@ -1,0 +1,10 @@
+#!/bin/bash
+
+INPUT=$1
+OUTPUT=${INPUT%.ne}.js
+
+echo "Building grammar"
+npx nearleyc $INPUT -o $OUTPUT
+echo "Linting output"
+eslint --fix $OUTPUT &> /dev/null
+sed -i '1s/^/\/* eslint-disable *\/\n/' $OUTPUT
