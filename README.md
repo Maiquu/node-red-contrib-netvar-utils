@@ -21,3 +21,8 @@ Create a production build:
 ```
 yarn build
 ```
+
+## TODO
+- Aliases
+- Documentation for nodes
+- Should be possible to change where input is read from

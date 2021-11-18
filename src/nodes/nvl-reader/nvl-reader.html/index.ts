@@ -24,7 +24,7 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
   },
   inputs: 1,
   outputs: 1,
-  icon: 'file.png',
+  icon: 'codesys.svg',
   paletteLabel: 'nvl reader',
   label() {
     return this.name || 'nvl reader'

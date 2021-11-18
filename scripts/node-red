@@ -1,4 +1,7 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
 if [[ -e node-red.pid ]]; then
   kill -s SIGTERM "$(cat node-red.pid)"
 fi

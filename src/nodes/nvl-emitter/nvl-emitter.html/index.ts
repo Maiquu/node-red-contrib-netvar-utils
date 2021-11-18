@@ -16,7 +16,7 @@ RED.nodes.registerType<NvlEmitterEditorNodeProperties>('nvl-emitter', {
   },
   inputs: 1,
   outputs: 1,
-  icon: 'file.png',
+  icon: 'codesys.svg',
   paletteLabel: 'nvl emitter',
   label() {
     return this.name || 'nvl emitter'

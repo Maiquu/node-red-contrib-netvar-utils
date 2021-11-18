@@ -24,7 +24,7 @@ RED.nodes.registerType<NvlJsonEditorNodeProperties>('nvl-json', {
   },
   inputs: 1,
   outputs: 1,
-  icon: 'file.png',
+  icon: 'codesys.svg',
   paletteLabel: 'nvl json',
   label() {
     return this.name || 'nvl json'
