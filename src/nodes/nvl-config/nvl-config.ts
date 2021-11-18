@@ -17,7 +17,9 @@ const clone = rfdc()
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlConfigNodeConstructor(this: NvlConfigNode, config: NvlConfigNodeDef): void {
     RED.nodes.createNode(this, config)
-
+    // Node-RED converts number inputs to string.
+    const projectId = parseInt(config.projectId)
+    const netvarListId = parseInt(config.netvarListId)
     const definitions = parseNetvarList(this, config.netvarList)
     const jsonTemplate = buildNetworkVariableListJSON(definitions)
     const jsonSchema = buildJSONSchemaFromDefinitions(definitions)
@@ -28,8 +30,8 @@ const nodeInit: NodeInitializer = (RED): void => {
     )
     const packetEmitters = expectedPackets.map(packet => 
       compilePacketEmitter(packet, {
-        id: config.projectId,
-        listId: config.netvarListId,
+        id: projectId,
+        listId: netvarListId,
       }),
     )
 
@@ -44,13 +46,12 @@ const nodeInit: NodeInitializer = (RED): void => {
       if (packet.length < PACKET_HEADER_SIZE) return false
       const header = readPacketHeader(packet)
       const expectedPacket = expectedPackets[header.packetIndex]
-        
       return expectedPacket 
-            && header.id === config.projectId
-            && header.listId === config.netvarListId
-            && header.packetSize === expectedPacket.size
-            && header.packetSize === packet.length
-            && header.variableCount === expectedPacket.variableCount
+        && header.id === projectId
+        && header.listId === netvarListId
+        && header.packetSize === expectedPacket.size
+        && header.packetSize === packet.length
+        && header.variableCount === expectedPacket.variableCount
     }
     
     this.isFirstPacket = (packet: Buffer) => 

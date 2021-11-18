@@ -1,5 +1,5 @@
 export interface NvlConfigOptions {
-  projectId: number
-  netvarListId: number
+  projectId: string
+  netvarListId: string
   netvarList: string
 }

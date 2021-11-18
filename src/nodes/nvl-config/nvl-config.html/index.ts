@@ -8,9 +8,9 @@ RED.nodes.registerType<NvlConfigEditorNodeProperties>('nvl-config', {
   defaults: {
     name: { value: '' },
     projectId: { 
-      value: 861089024,
+      value: '861089024',
       required: true,
-      validate: RED.validators.number(), 
+      validate: RED.validators.number(),
     },
     netvarListId: { 
       value: '',
