@@ -1,3 +1,4 @@
+import { NvDefinition, NvType } from '../../shared/types'
 /**
  * Generates a variable name that is all uppercase based on given number
  */
@@ -112,4 +113,56 @@ export function getForStatementRanges(dimensions: number[], begin: number, end: 
     lastPoint = point
   }
   return ranges
+}
+
+/** Partial JSONSchema interface */
+export interface JSONSchema {
+  type?: 'null' | 'boolean' | 'string' | 'number' | 'integer' | 'object' | 'array'
+  format?: string
+  items?: JSONSchema | JSONSchema[]
+  minItems?: number
+  properties?: { [x: string]: JSONSchema }
+}
+
+export function buildJSONSchemaFromDefinitions(definitions: NvDefinition[]): JSONSchema {
+
+  const schema: JSONSchema & Required<Pick<JSONSchema, 'properties'>> = {
+    type: 'object',
+    properties: {},
+  }
+
+  for (const definition of definitions) {
+    if (definition.isArray) {
+      const subschema: JSONSchema = {}
+      let next = subschema
+      for (const dimension of definition.dimensions) {
+        next.type = 'array'
+        next.minItems = dimension
+        next = next.items = {}
+      }
+      Object.assign(next, getJSONSchemaOf(definition.type))
+      schema.properties[definition.name] = subschema
+    } 
+    else {
+      const subschema = getJSONSchemaOf(definition.type)
+      schema.properties[definition.name] = subschema
+    }
+  }
+
+  return schema
+}
+
+/** Get JSON Schema for given NVL Type. Based on https://github.com/fastify/fast-json-stringify#fastjsonstringifyschema */
+function getJSONSchemaOf(type: NvType): JSONSchema {
+  switch (type) {
+    case 'BOOL':
+      return { type: 'boolean' }
+    case 'STRING':
+      return { type: 'string' }
+    case 'REAL':
+    case 'LREAL':
+      return { type: 'number' }
+    default:
+      return { type: 'integer' }
+  }
 }

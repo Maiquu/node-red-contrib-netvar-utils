@@ -13,14 +13,6 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
       type: 'nvl-config', 
       required: true, 
     },
-    // inProperty: {
-    //   value: 'payload',
-    //   required: true,
-    // },
-    // outProperty: {
-    //   value: 'payload',
-    //   required: true,
-    // },
   },
   inputs: 1,
   outputs: 1,
@@ -28,13 +20,5 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
   paletteLabel: 'nvl reader',
   label() {
     return this.name || 'nvl reader'
-  },
-  oneditprepare() {
-    // $('#node-input-inProperty').typedInput({
-    //   types: ['msg'],
-    // })
-    // $('#node-input-outProperty').typedInput({
-    //   types: ['msg'],
-    // })
   },
 })

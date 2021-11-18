@@ -1,33 +1,78 @@
+import Ajv from 'ajv'
+import rfdc from 'rfdc'
 import { NodeInitializer } from 'node-red'
 import { Parser, Grammar } from 'nearley'
 import { NvDefinition, NvPacket } from '../shared/types'
 import { NvlConfigNode, NvlConfigNodeDef } from './modules/types'
-import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, PACKET_HEADER_SIZE } from '../shared/constants'
+import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, OFFSET_PACKET_INDEX, PACKET_HEADER_SIZE } from '../shared/constants'
 import grammar from './modules/nvl-grammar'
 import { compilePacketReader } from './modules/compile-reader'
 import { compilePacketEmitter } from './modules/compile-emitter'
-import { buildNetworkVariableListJSON } from '../shared/util'
+import { buildNetworkVariableListJSON, readPacketHeader } from '../shared/util'
+import { buildJSONSchemaFromDefinitions } from './modules/util'
+
+const ajv = new Ajv()
+const clone = rfdc()
 
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlConfigNodeConstructor(this: NvlConfigNode, config: NvlConfigNodeDef): void {
     RED.nodes.createNode(this, config)
-    this.definitions = parseNetvarList(this, config.netvarList)
-    this.json = Object.freeze(buildNetworkVariableListJSON(this.definitions))
-    this.expectedPackets = getExpectedPackets(this.definitions)
-    this.readers = this.expectedPackets.map(packet => 
-      compilePacketReader(packet, {
-        id: config.projectId,
-        listId: config.netvarListId,
-      }),
-    )
 
-    this.emitters = this.expectedPackets.map(packet => 
+    const definitions = parseNetvarList(this, config.netvarList)
+    const jsonTemplate = buildNetworkVariableListJSON(definitions)
+    const jsonSchema = buildJSONSchemaFromDefinitions(definitions)
+    const expectedPackets = getExpectedPackets(definitions)
+
+    const packetReaders = expectedPackets.map(packet => 
+      compilePacketReader(packet),
+    )
+    const packetEmitters = expectedPackets.map(packet => 
       compilePacketEmitter(packet, {
         id: config.projectId,
         listId: config.netvarListId,
       }),
     )
 
+    //#region Public API
+
+    this.buildNetvarJSON = () => clone(jsonTemplate)
+
+    this.validateNetvarJSON = ajv.compile<Record<string, any>>(jsonSchema)
+
+    // Check if received packet is expected according to given configuration
+    this.isExpectedPacket = (packet: Buffer): boolean => {
+      if (packet.length < PACKET_HEADER_SIZE) return false
+      const header = readPacketHeader(packet)
+      const expectedPacket = expectedPackets[header.packetIndex]
+        
+      return expectedPacket 
+            && header.id === config.projectId
+            && header.listId === config.netvarListId
+            && header.packetSize === expectedPacket.size
+            && header.packetSize === packet.length
+            && header.variableCount === expectedPacket.variableCount
+    }
+    
+    this.isFirstPacket = (packet: Buffer) => 
+      packet.readUInt16LE(OFFSET_PACKET_INDEX) === 0
+
+    this.isLastPacket = (packet: Buffer) => 
+      packet.readUInt16LE(OFFSET_PACKET_INDEX) === expectedPackets.length - 1
+
+    this.readPacket = (target: Record<string, any>, packet: Buffer): void => {
+      const index = packet.readUInt16LE(OFFSET_PACKET_INDEX)
+      const reader = packetReaders[index]
+      reader(target, packet)
+    }
+
+    this.emitPackets = (target: Record<string, any>, counter: number): Buffer[] => {
+      return packetEmitters.map(emitter => 
+        emitter(target, counter),  
+      )
+    }
+
+    //#endregion
+    
   }
 
   RED.nodes.registerType('nvl-config', NvlConfigNodeConstructor)
@@ -53,6 +98,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
   const defineNewPacket = (index: number): NvPacket => ({
     index,
     size: PACKET_HEADER_SIZE,
+    variableCount: 0,
     definitions: [],
   })
 
@@ -67,6 +113,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
       
       if (remainder >= totalSize) {
         currentPacket.size += totalSize
+        currentPacket.variableCount += volume
         currentPacket.definitions.push({
           ...definition,
           begin: 0, 
@@ -76,6 +123,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
       else {
         let volumeIndex = Math.floor(remainder / unitSize)
         currentPacket.size += volumeIndex * unitSize
+        currentPacket.variableCount += volumeIndex
         currentPacket.definitions.push({
           ...definition,
           begin: 0,
@@ -89,6 +137,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
           if (MAX_VARIABLE_SIZE < remainingArraySize) {
             const unitSpan = Math.floor(MAX_VARIABLE_SIZE / unitSize)
             currentPacket.size += unitSpan * unitSize
+            currentPacket.variableCount += unitSpan
             currentPacket.definitions.push({
               ...definition,
               begin: volumeIndex,
@@ -100,6 +149,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
           }
           else {
             currentPacket.size += remainingUnitCount * unitSize
+            currentPacket.variableCount += remainingUnitCount
             currentPacket.definitions.push({
               ...definition,
               begin: volumeIndex,
@@ -115,6 +165,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
         packets.push(currentPacket)
         currentPacket = defineNewPacket(packets.length)
         currentPacket.size += definition.size
+        currentPacket.variableCount += 1
         currentPacket.definitions.push(definition)
         if (definition.size > MAX_VARIABLE_SIZE) {
           packets.push(currentPacket)
@@ -123,6 +174,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
       }
       else {
         currentPacket.size += definition.size
+        currentPacket.variableCount += 1
         currentPacket.definitions.push(definition)
       }
     }
@@ -132,6 +184,7 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
   
   return packets
 }
+
 
 function createNetvarSyntaxError(err: Error): SyntaxError {
   const message = `Error while parsing network variable list.\n${

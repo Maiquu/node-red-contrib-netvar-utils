@@ -1,9 +1,6 @@
 import { NodeInitializer } from 'node-red'
-import rfdc from 'rfdc'
 import { NvlConfigNode } from '../nvl-config/modules/types'
 import { NvlJsonNode, NvlJsonNodeDef } from './modules/types'
-
-const clone = rfdc()
 
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlJsonNodeConstructor(
@@ -18,7 +15,7 @@ const nodeInit: NodeInitializer = (RED): void => {
       if (!this.nvl)
         return done(new TypeError('Network Variable List is not defined'))
 
-      msg.payload = clone(this.nvl.json)
+      msg.payload = this.nvl.buildNetvarJSON()
       send(msg)
       done()
     })

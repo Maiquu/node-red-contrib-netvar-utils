@@ -1,4 +1,5 @@
-import { NvDefinition, NvType, NvPacketHeader, NvPacket } from './types'
+import { OFFSET_COUNTER, OFFSET_ID, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from './constants'
+import { NvDefinition, NvType, NvPacketHeader, NvSegmentDefinition } from './types'
 
 export function times<T>(repeat: number, callback: (index: number) => T): T[] {
   const arr: T[] = []
@@ -7,7 +8,7 @@ export function times<T>(repeat: number, callback: (index: number) => T): T[] {
   return arr
 }
 
-export function buildNetworkVariableListJSON<T extends Record<string, any>>(netvars: NvDefinition[]): T {
+export function buildNetworkVariableListJSON(netvars: NvDefinition[]): Record<string, any> {
   const nvl: Record<string, any> = {}
   for (const netvar of netvars) {
     nvl[netvar.name]
@@ -16,7 +17,7 @@ export function buildNetworkVariableListJSON<T extends Record<string, any>>(netv
         : getInitialValue(netvar.type)
   }
 
-  return nvl as T
+  return nvl
 }
 
 function buildNetworkVariableListJSONArray(dimensions: number[], fill: any): any[] {
@@ -95,7 +96,6 @@ export function getReaderOf(type: NvType): BufferReader {
     case 'USINT':
       return (buffer: Buffer, offset?: number) =>
         buffer.readUInt8(offset)
-
     case 'SINT':
       return (buffer: Buffer, offset?: number) =>
         buffer.readInt8(offset)
@@ -142,35 +142,36 @@ export function readPacketHeader(buffer: Buffer): NvPacketHeader {
   if (buffer.length < 20)
     throw new TypeError('Network Variable UDP packets should be at least 20 byte long')
   return {
-    id: buffer.readUInt32LE(),
-    listId: buffer.readUInt16LE(8),
-    packetOrderNo: buffer.readUInt16LE(10),
-    variableCount: buffer.readUInt16LE(12),
-    packetSize: buffer.readUInt16LE(14),
-    counter: buffer.readUInt32LE(16),
+    id: buffer.readUInt32LE(OFFSET_ID),
+    listId: buffer.readUInt16LE(OFFSET_LIST_ID),
+    packetIndex: buffer.readUInt16LE(OFFSET_PACKET_INDEX),
+    variableCount: buffer.readUInt16LE(OFFSET_VAR_COUNT),
+    packetSize: buffer.readUInt16LE(OFFSET_PACKET_SIZE),
+    counter: buffer.readUInt32LE(OFFSET_COUNTER),
   }
 }
 
 export function readPacketIndex(buffer: Buffer): number {
-  if (buffer.length < 20)
-    throw new TypeError('Network Variable UDP packets should be at least 20 byte long')
+  if (buffer.length < PACKET_HEADER_SIZE)
+    throw new TypeError(`Network Variable UDP packets should be at least ${PACKET_HEADER_SIZE} byte long`)
   return buffer.readUInt16LE(10)
 }
 
 export function writePacketHeader(buffer: Buffer, header: NvPacketHeader): void {
-  if (buffer.length < 20)
-    throw new TypeError('Network Variable UDP packets should be at least 20 byte long')
-  buffer.writeUInt32LE(header.id)
-  buffer.writeUInt16LE(header.listId, 8)
-  buffer.writeUInt16LE(header.packetOrderNo, 10)
-  buffer.writeUInt16LE(header.variableCount, 12)
-  buffer.writeUInt16LE(header.packetSize, 14)
-  buffer.writeUInt32LE(header.counter, 16)
+  if (buffer.length < PACKET_HEADER_SIZE)
+    throw new TypeError(`Network Variable UDP packets should be at least ${PACKET_HEADER_SIZE} byte long`)
+  buffer.writeUInt32LE(header.id, OFFSET_ID)
+  buffer.writeUInt16LE(header.listId, OFFSET_LIST_ID)
+  buffer.writeUInt16LE(header.packetIndex, OFFSET_PACKET_INDEX)
+  buffer.writeUInt16LE(header.variableCount, OFFSET_VAR_COUNT)
+  buffer.writeUInt16LE(header.packetSize, OFFSET_PACKET_SIZE)
+  buffer.writeUInt32LE(header.counter, OFFSET_COUNTER)
 }
 
-export function getVariableCount(packet: NvPacket): number {
+/** Calculates the total number of variables in all definitions */
+export function countVariables(definitions: NvSegmentDefinition[]): number {
   let variableCount = 0
-  for (const definition of packet.definitions) {
+  for (const definition of definitions) {
     if (definition.isArray) 
       variableCount += definition.end - definition.begin
     else 

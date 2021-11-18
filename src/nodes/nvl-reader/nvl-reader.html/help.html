@@ -1,3 +1,25 @@
 <script type="text/html" data-help-name="nvl-reader">
-  <p>Node description goes here.</p>
+  <p>
+    Reads buffers sent by a network variable list sender (or emitted by <code>nvl-emitter</code>).
+  </p>
+  <h3>Input</h3>
+  <dl class="message-properties">
+    <dt>
+      payload
+      <span class="property-type">buffer</span>
+    </dt>
+    <dd>netvar packet sent by a sender</dd>
+  </dl>
+  <h3>Output</h3>
+  <dl class="message-properties">
+    <dt>
+      payload
+      <span class="property-type">object</span>
+    </dt>
+    <dd>network variable list as json object filled with values acquired from the buffer</dd>
+  </dl>
+  <h3>Details</h3>
+  <p>Output is sent when the all the expected packets are received.</p>
+  <p>Node ignores buffers that doesnt comply to its standard.</p>
+  <p>Node throws <code>Error</code> if it receieves anything other than <code>Buffer</code></p>
 </script>

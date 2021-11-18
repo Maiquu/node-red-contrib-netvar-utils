@@ -10,32 +10,24 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config)
 
     this.nvl = RED.nodes.getNode(config.nvl) as NvlConfigNode
-    this.template = {}
-
     let counter = 0
 
     this.on('input', (msg, send, done) => {
       if (!this.nvl)
         return done(new TypeError('Network Variable List is not defined'))
-      if (!msg.payload || typeof msg.payload !== 'object')
-        return done(new TypeError('Expect payload to be object'))
-      
-      let packets: Buffer[] = []
-      try {
-        packets = this.nvl.emitters.map(emitter => 
-          emitter(msg.payload as Record<string, any>, counter),
-        )
-      }
-      catch (err) {
-        this.error(err)
-        return done(new Error('Error while creating netvar buffer(s), did you forget to initialise netvar json?'))
+        
+      const nvl = this.nvl
+      const { payload } = msg
+      if (!nvl.validateNetvarJSON(payload)) {
+        this.error(nvl.validateNetvarJSON.errors)
+        return done(new TypeError('Bad JSON payload. See previous log for information'))
       }
 
+      const packets = nvl.emitPackets(payload, counter)
       counter++
       packets.forEach((packet) => {
         send({ payload: packet })
       })
-
       done()
     })
   }

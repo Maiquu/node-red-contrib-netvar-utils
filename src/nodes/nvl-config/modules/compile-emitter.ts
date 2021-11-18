@@ -1,5 +1,5 @@
 import { PACKET_HEADER_SIZE } from '../../shared/constants'
-import { times, getVariableCount } from '../../shared/util'
+import { times } from '../../shared/util'
 import { NvType, NvPacket, NvSegmentDefinition, NvPacketEmitter, NvArraySegmentDefinition, NvProperties } from '../../shared/types'
 import { getForStatementRanges, generateSafeVariableName } from './util'
 
@@ -114,14 +114,13 @@ function renderWriteStatement(definition: NvSegmentDefinition): string {
  * Compiles the function that emits packets according to the packet definition
  */
 export function compilePacketEmitter(packet: NvPacket, details: NvProperties): NvPacketEmitter {
-  const variableCount = getVariableCount(packet)
   let fn = `let offset = ${PACKET_HEADER_SIZE}\n`
       + `let buffer = Buffer.alloc(${packet.size})\n`
       // Write header to buffer
       + `buffer.writeUInt32LE(${details.id})\n`
       + `buffer.writeUInt16LE(${details.listId}, 8)\n`
       + `buffer.writeUInt16LE(${packet.index}, 10)\n`
-      + `buffer.writeUInt16LE(${variableCount}, 12)\n`
+      + `buffer.writeUInt16LE(${packet.variableCount}, 12)\n`
       + `buffer.writeUInt16LE(${packet.size}, 14)\n`
       + 'buffer.writeUInt32LE(counter, 16)\n'
       + 'let value = 0\n'

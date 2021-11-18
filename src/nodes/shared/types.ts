@@ -5,12 +5,12 @@ export interface NvProperties {
 }
 
 export interface NvPacketHeader {
-  /** Unique id for PLC maybe ? */
+  /** Some kind of unique ID (?) */
   id: number
   /** ID of the global variable list that is defined on PLC */
   listId: number
   /** Order number of the packet. Can be larger than 0 if the variable list is divided into multiple packets */
-  packetOrderNo: number
+  packetIndex: number
   /** Number of variables that is present in packet body */
   variableCount: number
   /** Byte size of packet */
@@ -26,6 +26,7 @@ export type NvPacketEmitter = (target: Record<string, NvValue>, counter: number)
 export interface NvPacket {
   index: number
   size: number
+  variableCount: number
   definitions: NvSegmentDefinition[] 
 }
 

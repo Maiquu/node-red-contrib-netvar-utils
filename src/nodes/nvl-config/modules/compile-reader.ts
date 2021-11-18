@@ -1,6 +1,6 @@
 import { times } from '../../shared/util'
 import { PACKET_HEADER_SIZE } from '../../shared/constants'
-import { NvType, NvPacketReader, NvPacket, NvSegmentDefinition, NvArraySegmentDefinition, NvProperties } from '../../shared/types'
+import { NvType, NvPacketReader, NvPacket, NvSegmentDefinition, NvArraySegmentDefinition } from '../../shared/types'
 import { getForStatementRanges, generateSafeVariableName } from './util'
 
 /**
@@ -107,22 +107,12 @@ function renderReadStatement(definition: NvSegmentDefinition) {
   return string
 }
 
-
-
 /**
- * Compiles the function that reads network variable list data, and mutates the target object
+ * Compiles the function that reads network variable list data, and mutates the target object.
+ * Assumes receieved packet is valid.
  */
-export function compilePacketReader(packet: NvPacket, props: NvProperties): NvPacketReader {
+export function compilePacketReader(packet: NvPacket): NvPacketReader {
   let fn = `let offset = ${PACKET_HEADER_SIZE}\n`
-    // Check if the received packet is the one reader is expecting
-    + `if ((buffer.length < ${PACKET_HEADER_SIZE})`
-    + `|| (buffer.readUInt32LE() !== ${props.id})`
-    + `|| (buffer.readUInt16LE(8) !== ${props.listId})`
-    + `|| (buffer.readUInt16LE(10) !== ${packet.index})`
-    // Make sure packet size is equal/larger than expected packet size
-    + `|| (buffer.readUInt16LE(14) < ${packet.size})`
-    + ') return\n'
-
   for (const definition of packet.definitions)
     fn += renderReadStatement(definition)
   return new Function('target', 'buffer', fn) as NvPacketReader

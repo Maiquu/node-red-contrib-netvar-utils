@@ -1,3 +1,23 @@
 <script type="text/html" data-help-name="nvl-emitter">
-  <p>Node description goes here.</p>
+  <p>
+    Emits buffers for network variable list receivers (can be interpreted by
+    <code>nvl-reader</code>).
+  </p>
+  <p>Multiple packets might be sent based on the size of the network variable list.</p>
+  <h3>Input</h3>
+  <dl class="message-properties">
+    <dt>
+      payload
+      <span class="property-type">object</span>
+    </dt>
+    <dd>netvar json object</dd>
+  </dl>
+  <h3>Output</h3>
+  <dl class="message-properties">
+    <dt>
+      payload
+      <span class="property-type">buffer</span>
+    </dt>
+    <dd>netvar packet for receivers</dd>
+  </dl>
 </script>
