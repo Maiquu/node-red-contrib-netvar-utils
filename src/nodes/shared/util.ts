@@ -46,7 +46,6 @@ function getInitialValue(type: NvType): boolean | number | bigint | string {
   }
 }
 
-
 const byteSizes: Readonly<Record<NvType, number>> = {
   // boolean
   BOOL: 1,

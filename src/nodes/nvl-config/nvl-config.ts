@@ -54,10 +54,10 @@ const nodeInit: NodeInitializer = (RED): void => {
         && header.variableCount === expectedPacket.variableCount
     }
     
-    this.isFirstPacket = (packet: Buffer) => 
+    this.isFirstPacket = (packet: Buffer): boolean => 
       packet.readUInt16LE(OFFSET_PACKET_INDEX) === 0
 
-    this.isLastPacket = (packet: Buffer) => 
+    this.isLastPacket = (packet: Buffer): boolean => 
       packet.readUInt16LE(OFFSET_PACKET_INDEX) === expectedPackets.length - 1
 
     this.readPacket = (target: Record<string, any>, packet: Buffer): void => {
