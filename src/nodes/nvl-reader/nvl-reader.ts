@@ -1,7 +1,7 @@
 import rfdc from 'rfdc'
 import { NodeInitializer } from 'node-red'
 import { NvlConfigNode } from '../nvl-config/modules/types'
-import { buildNetworkVariableListJSON, readPacketIndex } from '../shared/util'
+import { readPacketIndex } from '../shared/util'
 import { NvlReaderNode, NvlReaderNodeDef } from './modules/types'
 import { PACKET_HEADER_SIZE } from '../shared/constants'
 
@@ -15,9 +15,6 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config)
 
     this.nvl = RED.nodes.getNode(config.nvl) as NvlConfigNode
-    this.template = {}
-    if (this.nvl) 
-      this.template = buildNetworkVariableListJSON(this.nvl.definitions)
 
     let payload: Record<string, any> | undefined
 
@@ -32,14 +29,14 @@ const nodeInit: NodeInitializer = (RED): void => {
       const index = readPacketIndex(msg.payload)
       const reader = this.nvl.readers[index]
       if (index === 0)
-        payload = clone(this.template)
+        payload = clone(this.nvl.json)
       
-      if (payload && reader)
+      if (payload && reader) {
         reader(payload, msg.payload)
-      
-      if (index === this.nvl.expectedPackets.length - 1) {
-        msg.payload = payload
-        send(msg)   
+        if (index === this.nvl.expectedPackets.length - 1) {
+          send({ payload })
+          payload = undefined
+        }
       }
     
       done()

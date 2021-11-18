@@ -6,6 +6,7 @@ export interface NvlConfigNodeDef extends NodeDef, NvlConfigOptions {}
 
 export interface NvlConfigNode extends Node {
   definitions: NvDefinition[]
+  json: Readonly<Record<string, any>>
   expectedPackets: NvPacket[]
   readers: NvPacketReader[]
   emitters: NvPacketEmitter[]

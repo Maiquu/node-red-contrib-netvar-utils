@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-netvar-utils",
-  "version": "0.2.3",
-  "description": "Description of the node set here",
+  "version": "0.1.0",
+  "description": "Network variable list utilities",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
     "copy": "copyfiles -u 2 \"./src/nodes/**/*.{png,svg}\" \"./dist/nodes/\"",
@@ -15,10 +15,10 @@
     "dev": "rm -rf dist && yarn copy && concurrently --kill-others --names 'COPY,EDITOR,RUNTIME' --prefix '({name})' --prefix-colors 'yellow.bold,cyan.bold,greenBright.bold,magenta.bold' 'onchange -v \"src/**/*.png\" \"src/**/*.svg\" -- yarn copy' 'yarn build:editor:watch' 'yarn build:runtime:watch'",
     "lint": "eslint --ext .js,.ts .",
     "lint:fix": "eslint --ext .js,.ts . --fix",
-    "restart": "cd scripts && ./node-red",
+    "restart-nodered": "cd scripts && ./node-red",
     "nearleyc-nvl-grammar": "scripts/nearleyc src/nodes/nvl-config/modules/nvl-grammar.ne"
   },
-  "author": "Alex Kaul",
+  "author": "Ege İliklier",
   "license": "MIT",
   "node-red": {
     "nodes": {

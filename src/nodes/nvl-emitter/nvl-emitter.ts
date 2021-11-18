@@ -17,14 +17,21 @@ const nodeInit: NodeInitializer = (RED): void => {
     this.on('input', (msg, send, done) => {
       if (!this.nvl)
         return done(new TypeError('Network Variable List is not defined'))
-      if (typeof msg.payload !== 'object')
+      if (!msg.payload || typeof msg.payload !== 'object')
         return done(new TypeError('Expect payload to be object'))
       
-      const packets = this.nvl.emitters.map(emitter => 
-        emitter(msg.payload as Record<string, any>, counter),
-      )
-      counter++
+      let packets: Buffer[] = []
+      try {
+        packets = this.nvl.emitters.map(emitter => 
+          emitter(msg.payload as Record<string, any>, counter),
+        )
+      }
+      catch (err) {
+        this.error(err)
+        return done(new Error('Error while creating netvar buffer(s), did you forget to initialise netvar json?'))
+      }
 
+      counter++
       packets.forEach((packet) => {
         send({ payload: packet })
       })

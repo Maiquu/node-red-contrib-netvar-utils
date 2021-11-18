@@ -6,11 +6,13 @@ import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, PACKET_HEADER_SIZE } from '../share
 import grammar from './modules/nvl-grammar'
 import { compilePacketReader } from './modules/compile-reader'
 import { compilePacketEmitter } from './modules/compile-emitter'
+import { buildNetworkVariableListJSON } from '../shared/util'
 
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlConfigNodeConstructor(this: NvlConfigNode, config: NvlConfigNodeDef): void {
     RED.nodes.createNode(this, config)
     this.definitions = parseNetvarList(this, config.netvarList)
+    this.json = Object.freeze(buildNetworkVariableListJSON(this.definitions))
     this.expectedPackets = getExpectedPackets(this.definitions)
     this.readers = this.expectedPackets.map(packet => 
       compilePacketReader(packet, {
@@ -26,18 +28,21 @@ const nodeInit: NodeInitializer = (RED): void => {
       }),
     )
 
-    this.readers.forEach(reader => console.log(reader.toString()))
-
   }
 
   RED.nodes.registerType('nvl-config', NvlConfigNodeConstructor)
 }
 
 function parseNetvarList(node: NvlConfigNode, netvars: string): NvDefinition[] {
-  const parser = new Parser(Grammar.fromCompiled(grammar))
-  parser.feed(netvars.trim())
-  if (parser.results.length > 1) 
-    node.warn('Network Variable Grammar is ambigious!')
+  const parser = new Parser(Grammar.fromCompiled(grammar), {})
+  try {
+    parser.feed(netvars.trim())
+    if (parser.results.length > 1) 
+      node.debug('[WARN] Network variable grammar is ambigious!')
+  }
+  catch (err) {
+    node.error(createNetvarSyntaxError(err as Error))
+  }
   return parser.results[0] || []
 }
 
@@ -128,5 +133,10 @@ function getExpectedPackets(definitions: NvDefinition[]): NvPacket[] {
   return packets
 }
 
+function createNetvarSyntaxError(err: Error): SyntaxError {
+  const message = `Error while parsing network variable list.\n${
+    err.message.slice(0, err.message.indexOf(' Instead'))}`
+  return new SyntaxError(message)
+}
 
 export = nodeInit

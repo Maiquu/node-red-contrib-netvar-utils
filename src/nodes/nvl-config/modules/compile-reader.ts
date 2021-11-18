@@ -115,11 +115,13 @@ function renderReadStatement(definition: NvSegmentDefinition) {
 export function compilePacketReader(packet: NvPacket, props: NvProperties): NvPacketReader {
   let fn = `let offset = ${PACKET_HEADER_SIZE}\n`
     // Check if the received packet is the one reader is expecting
-    + `if (buffer.readUInt32LE() !== ${props.id}) return\n`
-    + `if (buffer.readUInt16LE(8) !== ${props.listId}) return\n`
-    + `if (buffer.readUInt16LE(10) !== ${packet.index}) return\n`
+    + `if ((buffer.length < ${PACKET_HEADER_SIZE})`
+    + `|| (buffer.readUInt32LE() !== ${props.id})`
+    + `|| (buffer.readUInt16LE(8) !== ${props.listId})`
+    + `|| (buffer.readUInt16LE(10) !== ${packet.index})`
     // Make sure packet size is equal/larger than expected packet size
-    + `if (buffer.readUInt16LE(14) < ${packet.size}) return\n`
+    + `|| (buffer.readUInt16LE(14) < ${packet.size})`
+    + ') return\n'
 
   for (const definition of packet.definitions)
     fn += renderReadStatement(definition)
