@@ -18,9 +18,9 @@ VAR_GLOBAL
   flag: BOOL;
   counter: WORD;
   message: STRING(50);
-  wordArray: ARRAY OF [1..5] OF WORD;
-  timeMatrix: Array OF [1..2] OF ARRAY [1..3] OF WORD;
-  threeD: Array OF [0..1, 0..1, 0..1] OF WORD;
+  wordArray: ARRAY [1..5] OF WORD;
+  timeMatrix: ARRAY [1..2] OF ARRAY [1..3] OF WORD;
+  threeD: ARRAY [0..1, 0..1, 0..1] OF WORD;
 END_VAR 
 ```
 will be converted to:
