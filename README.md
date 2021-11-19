@@ -14,6 +14,7 @@ Outputed JSON object has the same structure as the one created via `nvl-json`.
 - `BigInt`
 - More detailed documentation for nodes
 - Options to define how input is received and how output is delivered
+- Tests
 
 ## License
 
