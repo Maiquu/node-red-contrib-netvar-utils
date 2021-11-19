@@ -10,6 +10,10 @@ Outputed JSON object has the same structure as the one created via `nvl-json`.
 
 > Created using [@alexk111](https://github.com/alexk111)'s [node-red template](https://github.com/alexk111/node-red-node-typescript-starter)
 
+## Supported Data Types
+
+https://github.com/Maiquu/node-red-contrib-netvar-utils/blob/e7a1abb9e9e802938581f19a3a0f66b8598b7195/src/nodes/shared/types.d.ts#L58
+
 ## TODO
 - `BigInt`
 - More detailed documentation for nodes
