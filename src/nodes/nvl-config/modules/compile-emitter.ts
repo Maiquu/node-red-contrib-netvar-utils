@@ -117,7 +117,7 @@ export function compilePacketEmitter(packet: NvPacket, listId: number): NvPacket
   let fn = `let offset = ${PACKET_HEADER_SIZE}\n`
       + `let buffer = Buffer.alloc(${packet.size})\n`
       // Write header to buffer
-      + `buffer.write('${NETVAR_PROTOCOL_ID}'), ${OFFSET_PROTOCOL}, 'ascii')\n`
+      + `buffer.write('${NETVAR_PROTOCOL_ID}', ${OFFSET_PROTOCOL}, 'ascii')\n`
       + `buffer.writeUInt16LE(${listId}, ${OFFSET_LIST_ID})\n`
       + `buffer.writeUInt16LE(${packet.index}, ${OFFSET_PACKET_INDEX})\n`
       + `buffer.writeUInt16LE(${packet.variableCount}, ${OFFSET_VAR_COUNT})\n`
@@ -127,6 +127,8 @@ export function compilePacketEmitter(packet: NvPacket, listId: number): NvPacket
 
   for (const definition of packet.definitions)
     fn += renderWriteStatement(definition)
+
+  console.log(fn)
 
   fn += 'return buffer\n'
 
