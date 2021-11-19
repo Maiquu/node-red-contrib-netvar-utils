@@ -10,6 +10,32 @@ Outputed JSON object has the same structure as the one created via `nvl-json`.
 
 > Created using [@alexk111](https://github.com/alexk111)'s [node-red template](https://github.com/alexk111/node-red-node-typescript-starter)
 
+## Example
+
+### JSON Structure
+```
+VAR_GLOBAL
+  flag: BOOL;
+  counter: WORD;
+  message: STRING(50);
+  wordArray: ARRAY OF [1..5] OF WORD;
+  timeMatrix: Array OF [1..2] OF ARRAY [1..3] OF WORD;
+END_VAR 
+```
+will be converted to:
+```json
+{
+  "flag": false,
+  "counter": 0,
+  "message": "",
+  "wordArray": [0,0,0,0,0],
+  "timeMatrix": [
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+}
+```
+
 ## Supported Data Types
 
 https://github.com/Maiquu/node-red-contrib-netvar-utils/blob/e7a1abb9e9e802938581f19a3a0f66b8598b7195/src/nodes/shared/types.d.ts#L58
