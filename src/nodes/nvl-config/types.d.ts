@@ -2,7 +2,6 @@ import { Node, NodeDef } from 'node-red'
 import { ValidateFunction } from 'ajv'
 
 export interface NvlConfigOptions {
-  projectId: string
   netvarListId: string
   netvarList: string
 }

@@ -13,11 +13,6 @@ RED.nodes.registerType<NvlConfigEditorNodeProperties>('nvl-config', {
   category: 'config',
   defaults: {
     name: { value: '' },
-    projectId: { 
-      value: '861089024',
-      required: true,
-      validate: RED.validators.number(),
-    },
     netvarListId: { 
       value: '',
       required: true,

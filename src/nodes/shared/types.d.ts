@@ -1,12 +1,6 @@
-
-export interface NvProperties {
-  id: number
-  listId: number
-}
-
 export interface NvPacketHeader {
-  /** Some kind of unique ID (?) */
-  id: number
+  /** Protocol identity code */
+  protocol: string
   /** ID of the global variable list that is defined on PLC */
   listId: number
   /** Order number of the packet. Can be larger than 0 if the variable list is divided into multiple packets */

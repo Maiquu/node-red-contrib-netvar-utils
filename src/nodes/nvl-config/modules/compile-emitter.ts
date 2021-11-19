@@ -1,6 +1,6 @@
-import { OFFSET_COUNTER, OFFSET_ID, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from '../../shared/constants'
+import { NETVAR_PROTOCOL_ID, OFFSET_COUNTER, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_PROTOCOL, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from '../../shared/constants'
 import { times } from '../../shared/util'
-import { NvType, NvPacket, NvSegmentDefinition, NvPacketEmitter, NvArraySegmentDefinition, NvProperties } from '../../shared/types'
+import { NvType, NvPacket, NvSegmentDefinition, NvPacketEmitter, NvArraySegmentDefinition } from '../../shared/types'
 import { getForStatementRanges, generateSafeVariableName } from './util'
 
 /**
@@ -113,12 +113,12 @@ function renderWriteStatement(definition: NvSegmentDefinition): string {
 /**
  * Compiles the function that emits packets according to the packet definition
  */
-export function compilePacketEmitter(packet: NvPacket, details: NvProperties): NvPacketEmitter {
+export function compilePacketEmitter(packet: NvPacket, listId: number): NvPacketEmitter {
   let fn = `let offset = ${PACKET_HEADER_SIZE}\n`
       + `let buffer = Buffer.alloc(${packet.size})\n`
       // Write header to buffer
-      + `buffer.writeUInt32LE(${details.id}, ${OFFSET_ID})\n`
-      + `buffer.writeUInt16LE(${details.listId}, ${OFFSET_LIST_ID})\n`
+      + `buffer.write('${NETVAR_PROTOCOL_ID}'), ${OFFSET_PROTOCOL}, 'ascii')\n`
+      + `buffer.writeUInt16LE(${listId}, ${OFFSET_LIST_ID})\n`
       + `buffer.writeUInt16LE(${packet.index}, ${OFFSET_PACKET_INDEX})\n`
       + `buffer.writeUInt16LE(${packet.variableCount}, ${OFFSET_VAR_COUNT})\n`
       + `buffer.writeUInt16LE(${packet.size}, ${OFFSET_PACKET_SIZE})\n`

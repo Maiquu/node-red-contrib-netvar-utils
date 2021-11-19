@@ -1,4 +1,4 @@
-import { OFFSET_COUNTER, OFFSET_ID, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from './constants'
+import { OFFSET_COUNTER, OFFSET_PROTOCOL, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE, NETVAR_PROTOCOL_ID } from './constants'
 import { NvDefinition, NvType, NvPacketHeader, NvSegmentDefinition } from './types'
 
 export function times<T>(repeat: number, callback: (index: number) => T): T[] {
@@ -141,7 +141,7 @@ export function readPacketHeader(buffer: Buffer): NvPacketHeader {
   if (buffer.length < 20)
     throw new TypeError('Network Variable UDP packets should be at least 20 byte long')
   return {
-    id: buffer.readUInt32LE(OFFSET_ID),
+    protocol: buffer.toString('ascii', OFFSET_PROTOCOL, NETVAR_PROTOCOL_ID.length),
     listId: buffer.readUInt16LE(OFFSET_LIST_ID),
     packetIndex: buffer.readUInt16LE(OFFSET_PACKET_INDEX),
     variableCount: buffer.readUInt16LE(OFFSET_VAR_COUNT),
@@ -159,12 +159,18 @@ export function readPacketIndex(buffer: Buffer): number {
 export function writePacketHeader(buffer: Buffer, header: NvPacketHeader): void {
   if (buffer.length < PACKET_HEADER_SIZE)
     throw new TypeError(`Network Variable UDP packets should be at least ${PACKET_HEADER_SIZE} byte long`)
-  buffer.writeUInt32LE(header.id, OFFSET_ID)
+  buffer.write(NETVAR_PROTOCOL_ID, OFFSET_PROTOCOL, 'ascii')
   buffer.writeUInt16LE(header.listId, OFFSET_LIST_ID)
   buffer.writeUInt16LE(header.packetIndex, OFFSET_PACKET_INDEX)
   buffer.writeUInt16LE(header.variableCount, OFFSET_VAR_COUNT)
   buffer.writeUInt16LE(header.packetSize, OFFSET_PACKET_SIZE)
   buffer.writeUInt32LE(header.counter, OFFSET_COUNTER)
+}
+
+export function isNvlPacket(buffer: Buffer): boolean {
+  return buffer.length >= PACKET_HEADER_SIZE
+    && buffer.toString('ascii', 0, 4) === NETVAR_PROTOCOL_ID
+    && buffer.readUInt16LE(OFFSET_PACKET_SIZE) === buffer.length
 }
 
 /** Calculates the total number of variables in all definitions */

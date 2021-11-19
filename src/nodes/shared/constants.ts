@@ -1,3 +1,4 @@
+export const NETVAR_PROTOCOL_ID = '\0-S3'
 export const PACKET_HEADER_SIZE = 20
 /** Packet sizes can exceed `MAX_PACKET_SIZE` if said packet only contains a string that exceeds `MAX_VARIABLE_SIZE` */
 export const MAX_PACKET_SIZE = 276
@@ -5,8 +6,8 @@ export const MAX_PACKET_SIZE = 276
 export const MAX_VARIABLE_SIZE = 256
 
 // Packet header offsets
-/** uint_32 LE */
-export const OFFSET_ID = 0
+/** char[4] */
+export const OFFSET_PROTOCOL = 0
 /** uint_16 LE */
 export const OFFSET_LIST_ID = 8
 /** uint_16 LE */

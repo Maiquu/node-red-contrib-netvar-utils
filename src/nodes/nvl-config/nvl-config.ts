@@ -4,11 +4,11 @@ import { NodeInitializer } from 'node-red'
 import { Parser, Grammar } from 'nearley'
 import { NvDefinition, NvPacket } from '../shared/types'
 import { NvlConfigNode, NvlConfigNodeDef } from './types'
-import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, OFFSET_PACKET_INDEX, PACKET_HEADER_SIZE } from '../shared/constants'
+import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from '../shared/constants'
 import grammar from './modules/nvl-grammar'
 import { compilePacketReader } from './modules/compile-reader'
 import { compilePacketEmitter } from './modules/compile-emitter'
-import { buildNetworkVariableListJSON, readPacketHeader } from '../shared/util'
+import { buildNetworkVariableListJSON, isNvlPacket } from '../shared/util'
 import { buildJSONSchemaFromDefinitions } from './modules/util'
 
 
@@ -19,7 +19,6 @@ const nodeInit: NodeInitializer = (RED): void => {
   function NvlConfigNodeConstructor(this: NvlConfigNode, config: NvlConfigNodeDef): void {
     RED.nodes.createNode(this, config)
     // Node-RED converts number inputs to string.
-    const projectId = parseInt(config.projectId)
     const netvarListId = parseInt(config.netvarListId)
     const definitions = parseNetvarList(this, config.netvarList)
     const jsonTemplate = buildNetworkVariableListJSON(definitions)
@@ -30,10 +29,7 @@ const nodeInit: NodeInitializer = (RED): void => {
       compilePacketReader(packet),
     )
     const packetEmitters = expectedPackets.map(packet => 
-      compilePacketEmitter(packet, {
-        id: projectId,
-        listId: netvarListId,
-      }),
+      compilePacketEmitter(packet, netvarListId),
     )
 
     //#region Public API
@@ -44,15 +40,13 @@ const nodeInit: NodeInitializer = (RED): void => {
 
     // Check if received packet is expected according to given configuration
     this.isExpectedPacket = (packet: Buffer): boolean => {
-      if (packet.length < PACKET_HEADER_SIZE) return false
-      const header = readPacketHeader(packet)
-      const expectedPacket = expectedPackets[header.packetIndex]
-      return expectedPacket 
-        && header.id === projectId
-        && header.listId === netvarListId
-        && header.packetSize === expectedPacket.size
-        && header.packetSize === packet.length
-        && header.variableCount === expectedPacket.variableCount
+      if (!isNvlPacket(packet)) return false
+      const index = packet.readUInt16LE(OFFSET_PACKET_INDEX)
+      const expectedPacket = expectedPackets[index]
+      return expectedPacket
+        && netvarListId === packet.readUInt16LE(OFFSET_LIST_ID)
+        && expectedPacket.size === packet.readUInt16LE(OFFSET_PACKET_SIZE)
+        && expectedPacket.variableCount === packet.readUInt16LE(OFFSET_VAR_COUNT)
     }
     
     this.isFirstPacket = (packet: Buffer): boolean => 
