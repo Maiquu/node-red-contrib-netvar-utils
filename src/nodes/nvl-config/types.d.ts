@@ -1,6 +1,11 @@
 import { Node, NodeDef } from 'node-red'
 import { ValidateFunction } from 'ajv'
-import { NvlConfigOptions } from '../shared/types'
+
+export interface NvlConfigOptions {
+  projectId: string
+  netvarListId: string
+  netvarList: string
+}
 
 export interface NvlConfigNodeDef extends NodeDef, NvlConfigOptions {}
 

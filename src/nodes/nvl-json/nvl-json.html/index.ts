@@ -1,5 +1,9 @@
-import { EditorRED } from 'node-red'
-import { NvlJsonEditorNodeProperties } from './modules/types'
+import { EditorRED, EditorNodeProperties } from 'node-red'
+import { NvlJsonOptions } from '../options'
+
+interface NvlJsonEditorNodeProperties
+  extends EditorNodeProperties,
+  NvlJsonOptions {}
 
 declare const RED: EditorRED
 

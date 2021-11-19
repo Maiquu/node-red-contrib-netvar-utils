@@ -1,6 +1,13 @@
-import { NodeInitializer } from 'node-red'
-import { NvlConfigNode } from '../nvl-config/modules/types'
-import { NvlJsonNode, NvlJsonNodeDef } from './modules/types'
+import { Node, NodeDef, NodeInitializer } from 'node-red'
+import { NvlConfigNode } from '../nvl-config/types'
+import { NvlJsonOptions } from './options'
+
+interface NvlJsonNodeDef extends NodeDef, NvlJsonOptions {}
+
+interface NvlJsonNode extends Node {
+  nvl?: NvlConfigNode
+  template: Record<string, any>
+}
 
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlJsonNodeConstructor(

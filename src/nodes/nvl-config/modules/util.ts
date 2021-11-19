@@ -1,4 +1,5 @@
 import { NvDefinition, NvType } from '../../shared/types'
+
 /**
  * Generates a variable name that is all uppercase based on given number
  */

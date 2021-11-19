@@ -3,7 +3,12 @@ set -euo pipefail
 IFS=$'\n\t'
 
 if [[ -e node-red.pid ]]; then
-  kill -s SIGTERM "$(cat node-red.pid)"
+  PID="$(cat node-red.pid)"
+  if ps -p $PID > /dev/null; then
+    kill -s SIGTERM $PID
+  else
+    rm node-red.pid
+  fi
 fi
 
 node-red &> node-red.log &

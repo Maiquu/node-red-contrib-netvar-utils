@@ -1,5 +1,9 @@
-import { EditorRED } from 'node-red'
-import { NvlEmitterEditorNodeProperties } from './modules/types'
+import { EditorRED, EditorNodeProperties } from 'node-red'
+import { NvlEmitterOptions } from '../options'
+
+interface NvlEmitterEditorNodeProperties
+  extends EditorNodeProperties,
+  NvlEmitterOptions {}
 
 declare const RED: EditorRED
 

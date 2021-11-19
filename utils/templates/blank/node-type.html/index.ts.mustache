@@ -1,5 +1,9 @@
-import { EditorRED } from "node-red";
-import { <%NodeTypePascalCase%>EditorNodeProperties } from "./modules/types";
+import { EditorRED, EditorNodeProperties } from "node-red";
+import { <%NodeTypePascalCase%>Options } from "../options";
+
+interface <%NodeTypePascalCase%>EditorNodeProperties
+  extends EditorNodeProperties,
+    <%NodeTypePascalCase%>Options {}
 
 declare const RED: EditorRED;
 

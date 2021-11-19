@@ -1,5 +1,11 @@
-import { EditorRED } from 'node-red'
-import { NvlConfigEditorNodeProperties } from './modules/types'
+import { EditorRED, EditorNodeProperties } from 'node-red'
+import { NvlConfigOptions } from '../types'
+
+interface NvlConfigEditorNodeProperties
+  extends EditorNodeProperties,
+  NvlConfigOptions {
+  editor?: AceAjax.Editor
+}
 
 declare const RED: EditorRED
 

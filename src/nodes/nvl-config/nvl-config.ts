@@ -3,13 +3,14 @@ import rfdc from 'rfdc'
 import { NodeInitializer } from 'node-red'
 import { Parser, Grammar } from 'nearley'
 import { NvDefinition, NvPacket } from '../shared/types'
-import { NvlConfigNode, NvlConfigNodeDef } from './modules/types'
+import { NvlConfigNode, NvlConfigNodeDef } from './types'
 import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, OFFSET_PACKET_INDEX, PACKET_HEADER_SIZE } from '../shared/constants'
 import grammar from './modules/nvl-grammar'
 import { compilePacketReader } from './modules/compile-reader'
 import { compilePacketEmitter } from './modules/compile-emitter'
 import { buildNetworkVariableListJSON, readPacketHeader } from '../shared/util'
 import { buildJSONSchemaFromDefinitions } from './modules/util'
+
 
 const ajv = new Ajv()
 const clone = rfdc()

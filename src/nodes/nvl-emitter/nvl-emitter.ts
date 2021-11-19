@@ -1,6 +1,13 @@
-import { NodeInitializer } from 'node-red'
-import { NvlConfigNode } from '../nvl-config/modules/types'
-import { NvlEmitterNode, NvlEmitterNodeDef } from './modules/types'
+import { Node, NodeDef, NodeInitializer } from 'node-red'
+import { NvlConfigNode } from '../nvl-config/types'
+import { NvlEmitterOptions } from './options'
+
+interface NvlEmitterNodeDef extends NodeDef, NvlEmitterOptions {}
+
+interface NvlEmitterNode extends Node {
+  nvl?: NvlConfigNode
+  template: Record<string, any>
+}
 
 const nodeInit: NodeInitializer = (RED): void => {
   function NvlEmitterNodeConstructor(
