@@ -128,8 +128,6 @@ export function compilePacketEmitter(packet: NvPacket, listId: number): NvPacket
   for (const definition of packet.definitions)
     fn += renderWriteStatement(definition)
 
-  console.log(fn)
-
   fn += 'return buffer\n'
 
   return new Function('target', 'counter', fn) as NvPacketEmitter
