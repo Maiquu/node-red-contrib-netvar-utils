@@ -20,6 +20,7 @@ VAR_GLOBAL
   message: STRING(50);
   wordArray: ARRAY OF [1..5] OF WORD;
   timeMatrix: Array OF [1..2] OF ARRAY [1..3] OF WORD;
+  threeD: Array OF [0..1, 0..1, 0..1] OF WORD;
 END_VAR 
 ```
 will be converted to:
@@ -30,8 +31,12 @@ will be converted to:
   "message": "",
   "wordArray": [0,0,0,0,0],
   "timeMatrix": [
-    [0, 0, 0],
-    [0, 0, 0]
+    [0,0,0],
+    [0,0,0]
+  ],
+  "threeD": [
+    [[0,0], [0,0]],
+    [[0,0], [0,0]]
   ]
 }
 ```
@@ -44,6 +49,7 @@ https://github.com/Maiquu/node-red-contrib-netvar-utils/blob/e7a1abb9e9e80293858
 - `BigInt`
 - More detailed documentation for nodes
 - Options to define how input is received and how output is delivered
+- `STRUCT`
 - Tests
 
 ## License
