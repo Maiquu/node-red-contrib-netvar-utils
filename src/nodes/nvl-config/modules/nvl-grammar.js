@@ -133,7 +133,9 @@
           
         return {
           type: expression.type,
-          size: getSizeOf(expression.type),
+          size: expression.type === 'STRING'
+            ? expression.size
+            : getSizeOf(expression.type),
           isArray: true,
           dimensions,
         }

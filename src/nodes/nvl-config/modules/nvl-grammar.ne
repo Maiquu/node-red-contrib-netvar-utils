@@ -131,7 +131,9 @@ ArrayExpression -> %array _ %lsquare _ RangeElementList _ %rsquare __ %of __ Exp
   }
   return {
     type: expression.type,
-    size: getSizeOf(expression.type),
+    size: expression.type === 'STRING'
+      ? expression.size
+      : getSizeOf(expression.type),
     isArray: true,
     dimensions,
   }
