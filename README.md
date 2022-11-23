@@ -71,6 +71,7 @@ will be converted to:
 - `STRUCT`
 - Dynamic network variable lists
 - Tests
+- Usage Examples
 
 ## License
 
