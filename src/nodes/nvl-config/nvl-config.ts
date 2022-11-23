@@ -84,7 +84,7 @@ function parseNetvarList(node: NvlConfigNode, netvars: string): NvDefinition[] {
   catch (err) {
     node.error(createNetvarSyntaxError(err as Error))
   }
-  return parser.results[0] || []
+  return parser.results?.[0] || []
 }
 
 /** Get expected packets, their sizes and the variables they should contain by interpreting network variable list definitions */
