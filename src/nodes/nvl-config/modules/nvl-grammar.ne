@@ -34,7 +34,7 @@ function getSizeOf(type) {
 
 const lexer = moo.states({
   main: {
-    ws: { match: /[ \t\n]+/, lineBreaks: true },
+    ws: { match: /\s+/, lineBreaks: true },
     colon: ':',
     semicolon: ';',
     lsquare: { match: '[', push: 'range' },
