@@ -8,6 +8,8 @@ export const MAX_VARIABLE_SIZE = 256
 // Packet header offsets
 /** char[4] */
 export const OFFSET_PROTOCOL = 0
+/** uint_16 LE (Always zero) */
+export const OFFSET_ID = 4
 /** uint_16 LE */
 export const OFFSET_LIST_ID = 8
 /** uint_16 LE */
@@ -16,5 +18,9 @@ export const OFFSET_PACKET_INDEX = 10
 export const OFFSET_VAR_COUNT = 12
 /** uint_16 LE */
 export const OFFSET_PACKET_SIZE = 14
-/** uint_32 LE */
+/** uint_16 LE */
 export const OFFSET_COUNTER = 16
+/** uint_8 */
+export const OFFSET_FLAGS = 18
+/** uint_8 */
+export const OFFSET_CHECKSUM = 19

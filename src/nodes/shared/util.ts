@@ -156,7 +156,7 @@ export function readPacketIndex(buffer: Buffer): number {
   return buffer.readUInt16LE(10)
 }
 
-export function writePacketHeader(buffer: Buffer, header: NvPacketHeader): void {
+export function writePacketHeader(buffer: Buffer, header: Omit<NvPacketHeader, 'protocol'>): void {
   if (buffer.length < PACKET_HEADER_SIZE)
     throw new TypeError(`Network Variable UDP packets should be at least ${PACKET_HEADER_SIZE} byte long`)
   buffer.write(NETVAR_PROTOCOL_ID, OFFSET_PROTOCOL, 'ascii')
