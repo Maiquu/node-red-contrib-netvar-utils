@@ -53,7 +53,16 @@ will be converted to:
 
 ## Supported Data Types
 
-https://github.com/Maiquu/node-red-contrib-netvar-utils/blob/e7a1abb9e9e802938581f19a3a0f66b8598b7195/src/nodes/shared/types.d.ts#L58
+- ARRAY
+- STRING
+- BOOL
+- BYTE, WORD, DWORD
+- USINT, UINT, UDINT
+- SINT, INT, DINT
+- ULINT, LWORD, LINT
+- TIME, TOD, TIME_OF_DAY
+- DT, DATE_AND_TIME, DATE
+- REAL, LREAL
 
 ## TODO
 - `BigInt`
