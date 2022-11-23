@@ -17,8 +17,10 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config)
 
     this.nvl = RED.nodes.getNode(config.nvl) as NvlConfigNode
+    
+    const emitOnLastPacket = config.emitOn === 'last-packet'
 
-    let payload: Record<string, any> | undefined
+    let payload: Record<string, any> | null = null
 
     this.on('input', (msg, send, done) => {
       if (!this.nvl)
@@ -27,25 +29,52 @@ const nodeInit: NodeInitializer = (RED): void => {
         return done(new TypeError('Expected payload to be Buffer'))
       if (!this.nvl.isExpectedPacket(msg.payload))
         return done()
-      
+        
       const { nvl } = this
       const packet = msg.payload
-      if (nvl.isFirstPacket(packet))
-        payload = nvl.buildNetvarJSON()
       
-      if (payload) {
-        nvl.readPacket(payload, packet)
-        if (nvl.isLastPacket(packet)) {
-          send({ payload })
-          payload = undefined
+      if (emitOnLastPacket) {
+        if (nvl.isFirstPacket(packet))
+          payload = nvl.buildNetvarJSON()
+          
+        if (payload) {
+          nvl.readPacket(payload, packet)
+          if (nvl.isLastPacket(packet)) {
+            msg.payload = payload
+            send(msg)
+            payload = null
+          }
         }
+        done()
       }
-
-      done()
+      else {
+        RED.util.evaluateNodeProperty(config.initial, config.initialType, this, msg, (err, value) => {
+          if (value) {
+            if (!nvl.validateNetvarJSON(value)) {
+              this.error(nvl.validateNetvarJSON.errors)
+              return done(new TypeError('Bad JSON payload. See previous log for information'))
+            }
+            nvl.readPacket(value, packet)
+            msg.payload = value
+          }
+          else {
+            if (err) 
+              this.warn(`${err.message}. Using JSON with empty values.`)
+            
+            const payload = nvl.buildNetvarJSON()
+            nvl.readPacket(payload, packet)
+            msg.payload = payload
+          }
+          send(msg)
+          done()
+        })
+      }
     })
   }
 
   RED.nodes.registerType('nvl-reader', NvlEmitterNodeConstructor)
 }
+
+
 
 export = nodeInit

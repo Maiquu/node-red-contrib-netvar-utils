@@ -7,4 +7,16 @@
     <label for="node-input-nvl"><i class="fa fa-th-list"></i> NVL </label>
     <input type="text" id="node-input-nvl" />
   </div>
+  <div class="form-row">
+    <label for="node-input-emitOn"><i class="fa fa-archive"></i> Send msg</label>
+    <select type="text" id="node-input-emitOn" style="width: 300px;">
+      <option value="last-packet">On Last Packet</option>
+      <option value="every-packet">On Every Packet</option>
+    </select>
+  </div>
+  <div class="form-row node-row-initial">
+    <label for="node-input-initial"> Initial JSON </label>
+    <input type="text" id="node-input-initial" />
+    <input type="hidden" id="node-input-initial-type" />
+  </div>
 </script>

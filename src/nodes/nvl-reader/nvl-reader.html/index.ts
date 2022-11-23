@@ -1,4 +1,4 @@
-import { EditorRED, EditorNodeProperties } from 'node-red'
+import { EditorRED, EditorNodeProperties, EditorWidgetTypedInputType } from 'node-red'
 import { NvlReaderOptions } from '../options'
 
 interface NvlReaderEditorNodeProperties
@@ -17,6 +17,12 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
       type: 'nvl-config', 
       required: true, 
     },
+    emitOn: {
+      value: 'last-packet',
+      required: true,
+    },
+    initial: { value: 'topic' },
+    initialType: { value: 'msg' },
   },
   inputs: 1,
   outputs: 1,
@@ -24,5 +30,19 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
   paletteLabel: 'nvl reader',
   label() {
     return this.name || 'nvl reader'
+  },
+  oneditprepare() {
+    $('#node-input-emitOn').on('change', function() {
+      const value = $(this).val()
+      $('.node-row-initial').toggle(value === 'every-packet')
+    })
+    $('#node-input-initial').typedInput({
+      types: ['msg', 'flow', 'global'],
+      typeField: '#node-input-initial-type',
+      default: this.initialType || 'msg',
+    })
+  },
+  oneditsave() {
+    this.initialType = $('#node-input-initial').typedInput('type') as EditorWidgetTypedInputType
   },
 })
