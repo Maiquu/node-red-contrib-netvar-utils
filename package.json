@@ -37,7 +37,11 @@
     "codesys"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=11.0.0"
+  },
   "node-red": {
+    "version": ">=1.3.0",
     "nodes": {
       "nvl-config": "./dist/nodes/nvl-config/nvl-config.js",
       "nvl-json": "./dist/nodes/nvl-json/nvl-json.js",
