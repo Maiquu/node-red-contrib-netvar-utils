@@ -5,4 +5,6 @@ export interface NvlReaderOptions {
   emitOn: 'last-packet' | 'every-packet'
   initial: string
   initialType: EditorWidgetTypedInputType
+  timeout?: number
+  timeoutBehaviour: 'send' | 'discard'
 }

@@ -23,6 +23,14 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
     },
     initial: { value: 'topic' },
     initialType: { value: 'msg' },
+    timeout: {
+      value: 100,
+      validate: RED.validators.number(true),
+    },
+    timeoutBehaviour: {
+      value: 'send',
+      required: true,
+    },
   },
   inputs: 1,
   outputs: 1,
@@ -34,6 +42,7 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
   oneditprepare() {
     $('#node-input-emitOn').on('change', function() {
       const value = $(this).val()
+      $('.node-row-timeout').toggle(value === 'last-packet')
       $('.node-row-initial').toggle(value === 'every-packet')
     })
     $('#node-input-initial').typedInput({
