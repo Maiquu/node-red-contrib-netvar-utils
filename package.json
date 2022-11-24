@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-netvar-utils",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Network Variable List utility nodes for node-red",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
@@ -34,7 +34,8 @@
     "nvl",
     "netvar",
     "utility",
-    "codesys"
+    "codesys",
+    "iec-61131-3"
   ],
   "license": "MIT",
   "engines": {
