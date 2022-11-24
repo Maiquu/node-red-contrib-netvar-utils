@@ -48,6 +48,9 @@ const nodeInit: NodeInitializer = (RED): void => {
         && expectedPacket.size === packet.readUInt16LE(OFFSET_PACKET_SIZE)
         && expectedPacket.variableCount === packet.readUInt16LE(OFFSET_VAR_COUNT)
     }
+
+    this.getExpectedPacketCount = () =>
+      expectedPackets.length
     
     this.isFirstPacket = (packet: Buffer): boolean => 
       packet.readUInt16LE(OFFSET_PACKET_INDEX) === 0

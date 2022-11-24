@@ -14,6 +14,7 @@ export interface NvlConfigNode extends Node {
   isExpectedPacket: (packet: Buffer) => boolean
   isFirstPacket: (packet: Buffer) => boolean
   isLastPacket: (packet: Buffer) => boolean
+  getExpectedPacketCount: () => number
   readPacket: (target: Record<string, any>, packet: Buffer) => void
   emitPackets: (target: Record<string, any>, counter: number) => Buffer[]
 }
