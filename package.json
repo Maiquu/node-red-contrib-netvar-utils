@@ -48,7 +48,6 @@
       "nvl-json": "./dist/nodes/nvl-json/nvl-json.js",
       "nvl-emitter": "./dist/nodes/nvl-emitter/nvl-emitter.js",
       "nvl-reader": "./dist/nodes/nvl-reader/nvl-reader.js",
-      "nvl-describe": "./dist/nodes/nvl-describe/nvl-describe.js",
       "nvl-header": "./dist/nodes/nvl-header/nvl-header.js"
     }
   },
