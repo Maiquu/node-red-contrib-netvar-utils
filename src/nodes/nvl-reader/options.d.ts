@@ -7,4 +7,5 @@ export interface NvlReaderOptions {
   initialType: EditorWidgetTypedInputType
   timeout?: number
   timeoutBehaviour: 'send' | 'discard'
+  sendStats: boolean
 }

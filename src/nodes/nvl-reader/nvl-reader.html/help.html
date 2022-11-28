@@ -8,16 +8,71 @@
       payload
       <span class="property-type">buffer</span>
     </dt>
-    <dd>netvar packet sent by a sender</dd>
+    <dd>Netvar packet sent by a sender</dd>
   </dl>
   <h3>Output</h3>
   <dl class="message-properties">
     <dt>
       payload
+      <span class="property-type">object | null</span>
+    </dt>
+    <dd>
+      Network variable list as JSON object filled with values acquired from the buffer. Can be
+      <code>null</code> if stats are enabled and payload is discarded on timeout.
+    </dd>
+    <dt>
+      stats
       <span class="property-type">object</span>
     </dt>
-    <dd>network variable list as json object filled with values acquired from the buffer</dd>
+    <dd>
+      Contains statistics about the read process that produced
+      <code>payload</code>. Must be enabled. Stats object contains following properties:
+    </dd>
+    <dl class="message-properties" style="margin: 6px">
+      <dt>
+        start
+        <span class="property-type">number</span>
+      </dt>
+      <dd>
+        Start timestamp of read process. Read process starts when a valid packet is received after
+        last read process.
+      </dd>
+      <dt>
+        end
+        <span class="property-type">number</span>
+      </dt>
+      <dd>
+        End timestamp of read process. Read process ends when all expected packets are received or
+        when it times out while waiting for expected packets.
+      </dd>
+      <dt>
+        duration
+        <span class="property-type">number</span>
+      </dt>
+      <dd>Duration of read process.</dd>
+      <dt>
+        timeout
+        <span class="property-type">boolean</span>
+      </dt>
+      <dd>true will read process timed-out.</dd>
+      <dt>
+        validPacketsReceived
+        <span class="property-type">number</span>
+      </dt>
+      <dd>Number of valid and uniquely indexed packets received.</dd>
+      <dt>
+        invalidPacketsReceived
+        <span class="property-type">number</span>
+      </dt>
+      <dd>Number of invalid packets received.</dd>
+      <dt>
+        missingPackets
+        <span class="property-type">number[]</span>
+      </dt>
+      <dd>Packet indexes that were expected but not received.</dd>
+    </dl>
   </dl>
+
   <h3>Details</h3>
   <p>Output is sent when the all the expected packets are received.</p>
   <p>Node ignores buffers that doesnt comply to its standard.</p>

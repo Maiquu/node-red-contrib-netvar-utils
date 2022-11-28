@@ -13,22 +13,26 @@ interface NvlReaderNode extends Node {
   template: Record<string, any>
 }
 
-interface NodeMessageStats extends NodeMessageInFlow {
+interface NodeMessageWithStats extends NodeMessage {
   stats: NvlReadStats
 }
 
 interface NvlReadStats {
-  start: Date
-  end: Date
+  start: number
+  end: number
   duration: number
   timeout: boolean
-  missing: number[]
+  validPacketsReceived: number
+  invalidPacketsReceived: number
+  missingPackets: number[]
 }
 
 interface NvlReadContext {
   send: debounce<(msg: NodeMessageInFlow, timeout: boolean) => void>
   payload: Record<string, any>
   packets: boolean[]
+  counter: number
+  invalidPacketCounter: number
 }
 
 type NodeInputListener = (
@@ -68,43 +72,67 @@ function createReadContext(
 ): NvlReadContext {
   const payload = nvl.createEmptyJSON()
   const packets = Array(nvl.getExpectedPacketCount()).fill(false) as boolean[]
-  const start = new Date()
+
   let messageSent = false
-  const debouncedSend = debounce(config.timeout || DEFAULT_TIMEOUT, (msg: NodeMessageInFlow, timeout: boolean) => {
-    const end = new Date()
-    const duration = end.getTime() - start.getTime()
-    const msgWithStats = util.cloneMessage(msg) as NodeMessageStats
-    msgWithStats.stats = {
-      start,
-      end,
-      duration,
-      timeout,
-      missing: packets.reduce((acc, received, index) => {
-        if (!received)
-          acc.push(index)
-        return acc
-      }, [] as number[]),
-    }
 
-    if (!messageSent) {
-      messageSent = true
-      if (!timeout || (timeout && config.timeoutBehaviour === 'send')) {
-        msg.payload = payload
-        send([msg, msgWithStats])
-        onSend()
-      }
-      else {
-        send([null, msgWithStats])
-        onSend()
-      }
-    }
-  })
-
-  return {
-    send: debouncedSend,
+  const context: NvlReadContext = {
     payload,
     packets,
+    counter: 0,
+    invalidPacketCounter: 0,
+    send: {} as debounce<any>,
   }
+
+  if (config.sendStats) {
+    const start = new Date().getTime()
+    context.send = debounce(config.timeout || DEFAULT_TIMEOUT, (msg, timeout) => {
+      const end = new Date().getTime()
+      const duration = end - start
+      const msgWithStats = util.cloneMessage(msg) as NodeMessageWithStats
+
+      msgWithStats.stats = {
+        start,
+        end,
+        duration,
+        timeout,
+        validPacketsReceived: context.counter,
+        invalidPacketsReceived: context.invalidPacketCounter,
+        missingPackets: packets.reduce((acc, received, index) => {
+          if (!received)
+            acc.push(index)
+          return acc
+        }, [] as number[]),
+      }
+
+      if (!messageSent) {
+        messageSent = true
+        if (!timeout || (timeout && config.timeoutBehaviour === 'send')) {
+          msgWithStats.payload = payload
+          send(msgWithStats)
+          onSend()
+        }
+        else {
+          msgWithStats.payload = null
+          send(msgWithStats)
+          onSend()
+        }
+      }
+    })
+  }
+  else {
+    context.send = debounce(config.timeout || DEFAULT_TIMEOUT, (msg, timeout) => {
+      if (!messageSent) {
+        messageSent = true
+        if (!timeout || (timeout && config.timeoutBehaviour === 'send')) {
+          msg.payload = payload
+          send(msg)
+          onSend()
+        }
+      }
+    })
+  }
+
+  return context as NvlReadContext
 }
 
 function createLastPacketListener(
@@ -113,26 +141,35 @@ function createLastPacketListener(
   nvl: Nvl,
 ) {
   let context: NvlReadContext | null = null
+  const expectedPacketCount = nvl.getExpectedPacketCount()
+  
   const listener: NodeInputListener = (msg, send, done) => {
 
     if (!(msg.payload instanceof Buffer))
       return done(new TypeError('Expected payload to be Buffer.'))
-    if (!nvl.isExpectedPacket(msg.payload))
-      return done()
     if (!context) {
       context = createReadContext(config, nvl, send, () => {
         context = null
       })
     }
+    if (!nvl.isExpectedPacket(msg.payload)) {
+      context.invalidPacketCounter++
+      return done()
+    }
 
     const packet = msg.payload
     const index = readPacketIndex(msg.payload)
 
-    context.packets[index] = true
-
+    if (!context.packets[index]) {
+      context.packets[index] = true
+      context.counter++
+      context.send(msg, true)
+    }
+    
     nvl.readPacket(context.payload, packet)
+
     context.send(msg, true)
-    if (context.packets.every(v => v)) {
+    if (context.counter >= expectedPacketCount && context.packets.every(v => v)) {
       context.send.cancel({ upcomingOnly: true })
       context.send(msg, false)
     }
