@@ -16,13 +16,13 @@ const nodeInit: NodeInitializer = (RED): void => {
   ): void {
     RED.nodes.createNode(this, config)
 
-    this.nvl = RED.nodes.getNode(config.nvl) as NvlConfigNode
+    const nvl = (RED.nodes.getNode(config.nvl) as NvlConfigNode | undefined)?.nvl
 
     this.on('input', (msg, send, done) => {
-      if (!this.nvl)
-        return done(new TypeError('Network Variable List is not defined'))
+      if (!nvl)
+        return done(new TypeError('Network Variable List is not defined or invalid.'))
 
-      msg.payload = this.nvl.buildNetvarJSON()
+      msg.payload = nvl.createEmptyJSON()
       send(msg)
       done()
     })

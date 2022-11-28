@@ -33,7 +33,7 @@ RED.nodes.registerType<NvlReaderEditorNodeProperties>('nvl-reader', {
     },
   },
   inputs: 1,
-  outputs: 1,
+  outputs: 2,
   icon: 'codesys.svg',
   paletteLabel: 'nvl reader',
   label() {

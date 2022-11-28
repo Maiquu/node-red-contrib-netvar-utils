@@ -1,5 +1,5 @@
 import { Node, NodeDef } from 'node-red'
-import { ValidateFunction } from 'ajv'
+import { Nvl } from './modules/nvl'
 
 export interface NvlConfigOptions {
   netvarListId: string
@@ -9,12 +9,5 @@ export interface NvlConfigOptions {
 export interface NvlConfigNodeDef extends NodeDef, NvlConfigOptions {}
 
 export interface NvlConfigNode extends Node {
-  buildNetvarJSON: () => Record<string, any>
-  validateNetvarJSON: ValidateFunction<Record<string, any>>
-  isExpectedPacket: (packet: Buffer) => boolean
-  isFirstPacket: (packet: Buffer) => boolean
-  isLastPacket: (packet: Buffer) => boolean
-  getExpectedPacketCount: () => number
-  readPacket: (target: Record<string, any>, packet: Buffer) => void
-  emitPackets: (target: Record<string, any>, counter: number) => Buffer[]
+  nvl: Nvl
 }
