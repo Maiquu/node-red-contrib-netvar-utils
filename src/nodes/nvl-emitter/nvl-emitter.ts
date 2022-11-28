@@ -30,7 +30,7 @@ const nodeInit: NodeInitializer = (RED): void => {
       }
 
       const packets = nvl.emitPackets(payload, counter)
-      counter++
+      counter += nvl.getExpectedPacketCount()
       packets.forEach((packet) => {
         send({ payload: packet })
       })
