@@ -20,6 +20,10 @@ Currently `nvl-reader` will silently omit invalid packets.
 
 Outputs NVL packet(s) using given JSON object. Input JSON object **must** have the same structure as the ones outputed via `nvl-json` and `nvl-reader`.
 
+### `nvl-header`
+
+Outputs header details of NVL packet.
+
 ## Example
 
 ### JSON Structure
