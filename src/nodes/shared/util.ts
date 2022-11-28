@@ -146,7 +146,7 @@ export function readPacketHeader(buffer: Buffer): NvPacketHeader {
     packetIndex: buffer.readUInt16LE(OFFSET_PACKET_INDEX),
     variableCount: buffer.readUInt16LE(OFFSET_VAR_COUNT),
     packetSize: buffer.readUInt16LE(OFFSET_PACKET_SIZE),
-    counter: buffer.readUInt32LE(OFFSET_COUNTER),
+    counter: buffer.readUInt16LE(OFFSET_COUNTER),
   }
 }
 
