@@ -28,7 +28,8 @@ interface NvlReadStats {
 }
 
 interface NvlReadContext {
-  send: debounce<(msg: NodeMessageInFlow, timeout: boolean) => void>
+  send: (msg: NodeMessageInFlow, timeout: boolean) => void
+  debouncedSend: debounce<(msg: NodeMessageInFlow, timeout: boolean) => void>
   payload: Record<string, any>
   packets: boolean[]
   counter: number
@@ -75,17 +76,17 @@ function createReadContext(
 
   let messageSent = false
 
+  /* @ts-ignore-next-line */
   const context: NvlReadContext = {
     payload,
     packets,
     counter: 0,
     invalidPacketCounter: 0,
-    send: {} as debounce<any>,
   }
 
   if (config.sendStats) {
     const start = new Date().getTime()
-    context.send = debounce(config.timeout || DEFAULT_TIMEOUT, (msg, timeout) => {
+    context.send = (msg, timeout) => {
       const end = new Date().getTime()
       const duration = end - start
       const msgWithStats = util.cloneMessage(msg) as NodeMessageWithStats
@@ -117,10 +118,10 @@ function createReadContext(
           onSend()
         }
       }
-    })
+    }
   }
   else {
-    context.send = debounce(config.timeout || DEFAULT_TIMEOUT, (msg, timeout) => {
+    context.send = (msg, timeout) => {
       if (!messageSent) {
         messageSent = true
         if (!timeout || (timeout && config.timeoutBehaviour === 'send')) {
@@ -129,8 +130,10 @@ function createReadContext(
           onSend()
         }
       }
-    })
+    }
   }
+
+  context.debouncedSend = debounce(config.timeout || DEFAULT_TIMEOUT, context.send)
 
   return context as NvlReadContext
 }
@@ -163,16 +166,15 @@ function createLastPacketListener(
     if (!context.packets[index]) {
       context.packets[index] = true
       context.counter++
-      context.send(msg, true)
+      nvl.readPacket(context.payload, packet)
+      context.debouncedSend(msg, true)
+
+      if (context.counter >= expectedPacketCount && context.packets.every(v => v)) {
+        context.debouncedSend.cancel()
+        context.send(msg, false)
+      }
     }
     
-    nvl.readPacket(context.payload, packet)
-
-    context.send(msg, true)
-    if (context.counter >= expectedPacketCount && context.packets.every(v => v)) {
-      context.send.cancel({ upcomingOnly: true })
-      context.send(msg, false)
-    }
     done()
   }
   return listener
