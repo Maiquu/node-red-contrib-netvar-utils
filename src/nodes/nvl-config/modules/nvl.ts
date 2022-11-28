@@ -69,9 +69,11 @@ export class Nvl {
     reader(target, packet)
   }
 
-  emitPackets(target: Record<string, any>, counter: number): Buffer[] {
-    return this.emitters.map(emitter => 
-      emitter(target, counter),  
+  emitPackets(target: Record<string, any>, counter = 0): Buffer[] {
+    counter = Math.floor(counter)
+    counter %= 65535
+    return this.emitters.map((emitter, index) => 
+      emitter(target, counter + index),  
     )
   }
 
