@@ -1,6 +1,6 @@
 # node-red-contrib-netvar-utils
 
-This module provides set of utility nodes in [Node-RED](http://nodered.org) for creating, parsing NVL (Network Variable List) UDP packets. Supports NVL of any size.
+This module provides set of utility nodes in [Node-RED](http://nodered.org) for creating, parsing and reading NVL (Network Variable List) UDP packets. Supports NVL of any size.
 
 > Created using [@alexk111](https://github.com/alexk111)'s [node-red template](https://github.com/alexk111/node-red-node-typescript-starter)
 
