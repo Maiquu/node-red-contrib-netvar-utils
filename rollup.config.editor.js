@@ -52,17 +52,18 @@ const makePlugins = (nodeType) => [
       "src/nodes/shared/**/*.ts",
     ],
     target: "es5",
-    tsconfig: false,
     noEmitOnError: process.env.ROLLUP_WATCH ? false : true,
   }),
   htmlBundle(),
 ];
 
+/** @returns {import('rollup').RollupOptions} */
 const makeConfigItem = (nodeType) => ({
   input: `src/nodes/${nodeType}/${nodeType}.html/index.ts`,
   output: {
     file: `dist/nodes/${nodeType}/${nodeType}.html`,
     format: "iife",
+    sourcemap: true,
   },
   plugins: makePlugins(nodeType),
   watch: {
