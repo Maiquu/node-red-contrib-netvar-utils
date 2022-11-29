@@ -88,10 +88,9 @@ function createReadContext(
     const start = new Date().getTime()
     context.send = (msg, timeout) => {
       const end = new Date().getTime()
-      const duration = end - start
-      const msgWithStats = util.cloneMessage(msg) as NodeMessageWithStats
+      const duration = end - start;
 
-      msgWithStats.stats = {
+      (msg as NodeMessageWithStats).stats = {
         start,
         end,
         duration,
@@ -108,13 +107,13 @@ function createReadContext(
       if (!messageSent) {
         messageSent = true
         if (!timeout || (timeout && config.timeoutBehaviour === 'send')) {
-          msgWithStats.payload = payload
-          send(msgWithStats)
+          msg.payload = payload
+          send(msg)
           onSend()
         }
         else {
-          msgWithStats.payload = null
-          send(msgWithStats)
+          msg.payload = null
+          send(msg)
           onSend()
         }
       }
