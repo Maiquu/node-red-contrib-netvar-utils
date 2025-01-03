@@ -1,4 +1,4 @@
-import { Node, NodeDef, NodeInitializer } from 'node-red'
+import type { Node, NodeDef, NodeInitializer } from 'node-red'
 import { readPacketHeader } from '../shared/util'
 import { NvlHeaderOptions } from './options'
 

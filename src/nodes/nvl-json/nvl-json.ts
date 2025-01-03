@@ -1,4 +1,4 @@
-import { Node, NodeDef, NodeInitializer } from 'node-red'
+import type { Node, NodeDef, NodeInitializer } from 'node-red'
 import { NvlConfigNode } from '../nvl-config/types'
 import { NvlJsonOptions } from './options'
 

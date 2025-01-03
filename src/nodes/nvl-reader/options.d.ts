@@ -1,4 +1,4 @@
-import { EditorWidgetTypedInputType } from 'node-red'
+import type { EditorWidgetTypedInputType } from 'node-red'
 
 export interface NvlReaderOptions {
   nvl: string

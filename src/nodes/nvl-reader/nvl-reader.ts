@@ -1,9 +1,8 @@
-import { Node, NodeDef, NodeInitializer, NodeMessage, NodeMessageInFlow } from 'node-red'
+import type { Node, NodeAPI, NodeDef, NodeInitializer, NodeMessage, NodeMessageInFlow } from 'node-red'
 import { NvlConfigNode } from '../nvl-config/types'
 import { NvlReaderOptions } from './options'
 import { debounce } from 'throttle-debounce'
 import { readPacketIndex } from '../shared/util'
-import { util } from 'node-red'
 import { Nvl } from '../nvl-config/modules/nvl'
 
 interface NvlReaderNodeDef extends NodeDef, NvlReaderOptions {}
@@ -57,7 +56,7 @@ const nodeInit: NodeInitializer = (RED): void => {
 
     const listener = config.emitOn === 'last-packet'
       ? createLastPacketListener(this, config, nvl)
-      : createEveryPacketListener(this, config, nvl)
+      : createEveryPacketListener(this, config, nvl, RED)
 
     this.on('input', listener)
   }
@@ -183,6 +182,7 @@ function createEveryPacketListener(
   node: NvlReaderNode,
   config: NvlReaderNodeDef,
   nvl: Nvl,
+  api: NodeAPI,
 ) {
   const listener: NodeInputListener = (msg, send, done) => {
     if (!(msg.payload instanceof Buffer))
@@ -192,7 +192,7 @@ function createEveryPacketListener(
 
     const packet = msg.payload
 
-    util.evaluateNodeProperty(config.initial, config.initialType, node, msg, (err, value) => {
+    api.util.evaluateNodeProperty(config.initial, config.initialType, node, msg, (err, value) => {
       if (value) {
         if (!nvl.validateJSON(value)) {
           node.error(nvl.validateJSON.errors)

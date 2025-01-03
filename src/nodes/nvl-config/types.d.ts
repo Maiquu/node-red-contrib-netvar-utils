@@ -1,4 +1,4 @@
-import { Node, NodeDef } from 'node-red'
+import type { Node, NodeDef } from 'node-red'
 import { Nvl } from './modules/nvl'
 
 export interface NvlConfigOptions {

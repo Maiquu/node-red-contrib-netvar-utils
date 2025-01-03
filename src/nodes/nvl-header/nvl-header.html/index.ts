@@ -1,4 +1,4 @@
-import { EditorRED, EditorNodeProperties } from 'node-red'
+import type { EditorRED, EditorNodeProperties } from 'node-red'
 import { NvlHeaderOptions } from '../options'
 
 interface NvlHeaderEditorNodeProperties

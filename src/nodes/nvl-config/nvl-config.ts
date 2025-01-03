@@ -1,4 +1,4 @@
-import { NodeInitializer } from 'node-red'
+import type { NodeInitializer } from 'node-red'
 import { NvlConfigNode, NvlConfigNodeDef } from './types'
 import { Nvl } from './modules/nvl'
 
