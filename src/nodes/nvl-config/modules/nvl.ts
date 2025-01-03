@@ -2,7 +2,7 @@ import Ajv, { ValidateFunction } from 'ajv'
 import { Grammar, Parser } from 'nearley'
 import rfdc from 'rfdc'
 import { MAX_PACKET_SIZE, MAX_VARIABLE_SIZE, OFFSET_LIST_ID, OFFSET_PACKET_INDEX, OFFSET_PACKET_SIZE, OFFSET_VAR_COUNT, PACKET_HEADER_SIZE } from '../../shared/constants'
-import { NvDefinition, NvPacket, NvPacketEmitter, NvPacketReader } from '../../shared/types'
+import { NvDefinition, NvPacket, NvPacketEmitter, NvPacketReader, NvSingularDefinition } from '../../shared/types'
 import { buildNetworkVariableListJSON, isNvlPacket } from '../../shared/util'
 import { NvlConfigNode, NvlConfigNodeDef } from '../types'
 import { compilePacketEmitter } from './compile-emitter'
@@ -152,7 +152,7 @@ export class Nvl {
           currentPacket = defineNewPacket(packets.length)
           currentPacket.size += definition.size
           currentPacket.variableCount += 1
-          currentPacket.definitions.push(definition)
+          currentPacket.definitions.push(definition as NvSingularDefinition)
           if (definition.size > MAX_VARIABLE_SIZE) {
             packets.push(currentPacket)
             currentPacket = defineNewPacket(packets.length)
@@ -161,7 +161,7 @@ export class Nvl {
         else {
           currentPacket.size += definition.size
           currentPacket.variableCount += 1
-          currentPacket.definitions.push(definition)
+          currentPacket.definitions.push(definition as NvSingularDefinition)
         }
       }
     }

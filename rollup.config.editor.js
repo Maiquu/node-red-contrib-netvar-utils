@@ -52,6 +52,8 @@ const makePlugins = (nodeType) => [
       "src/nodes/shared/**/*.ts",
     ],
     target: "es5",
+    tsconfig: false,
+    allowSyntheticDefaultImports: true,
     noEmitOnError: process.env.ROLLUP_WATCH ? false : true,
   }),
   htmlBundle(),
